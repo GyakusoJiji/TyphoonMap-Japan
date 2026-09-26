@@ -1,0 +1,18 @@
+# TyphoonMap を NBox (foo@192.168.1.249) で動かす user ユニット。
+# 置き場所: ~/.config/systemd/user/typhoonmap.service
+#
+# Nbox App Launcher からは scope: "user" で起動する。常時起動させないので enable はしない。
+# 標準ライブラリだけで動くので venv は不要。
+[Unit]
+Description=TyphoonMap (user)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/TyphoonMap
+ExecStart=/usr/bin/python3 server.py --host 0.0.0.0 --port 8788
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

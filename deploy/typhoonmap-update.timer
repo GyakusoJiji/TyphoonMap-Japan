@@ -1,0 +1,15 @@
+# 置き場所: ~/.config/systemd/user/typhoonmap-update.timer
+# 有効化: systemctl --user enable --now typhoonmap-update.timer
+# （foo は linger 有効なので、ログインしていなくても動く）
+[Unit]
+Description=TyphoonMap: 毎日1回 気象庁から取得して data/tracks.js を更新する
+
+[Timer]
+# EQMap の更新（04:10）と重ならないようにずらす
+OnCalendar=*-*-* 04:40:00
+RandomizedDelaySec=600
+Persistent=true
+Unit=typhoonmap-update.service
+
+[Install]
+WantedBy=timers.target

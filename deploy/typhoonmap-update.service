@@ -1,0 +1,11 @@
+# TyphoonMap のベストトラック（data/tracks.js）を気象庁から取り直す oneshot の user ユニット。
+# 置き場所: ~/.config/systemd/user/typhoonmap-update.service
+# typhoonmap-update.timer から毎日1回起動される。書き込みは一時ファイル経由なので本体を止める必要はない。
+[Unit]
+Description=TyphoonMap: 気象庁のベストトラックを取得して data/tracks.js を更新する
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/TyphoonMap
+ExecStart=/usr/bin/python3 tools/update_data.py
