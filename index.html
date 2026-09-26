@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#070b14">
+  <meta name="description" content="An animated map of typhoon tracks near Japan, based on JMA best-track data.">
+  <title>TyphoonMap — Typhoon Track Animation</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="data/map.js"></script>
+  <script defer src="data/tracks.js"></script>
+  <script defer src="core.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main id="stage" aria-label="Typhoon track map">
+    <canvas id="base" aria-hidden="true"></canvas>
+    <canvas id="tracks" tabindex="0" role="img" aria-label="Typhoon tracks. Drag to pan, use the mouse wheel to zoom, and select a typhoon from the list or map."></canvas>
+  </main>
+  <header class="panel" id="hud">
+    <div class="brand"><span class="brand-mark">◉</span><h1>TyphoonMap<small>Typhoon Track Time-Series Animation</small></h1><span class="badge">BEST TRACK</span></div>
+    <dl class="stats"><dt>Coverage</dt><dd id="coverage">Loading…</dd><dt>Source</dt><dd>JMA Best Track</dd><dt>Fetched</dt><dd id="fetched">—</dd></dl>
+    <div class="filters"><label>Year <select id="year" aria-label="Year"></select></label><label>Area <select id="region"><option value="japan">Near Japan</option><option value="all">All W. North Pacific</option></select></label></div>
+    <p class="muted region-note" id="region-note">Tracks entering 20–46°N / 120–155°E</p>
+    <div class="list-heading"><span id="count">—</span><button id="all" class="text-button">Show all</button></div>
+    <div id="storm-list" aria-label="Typhoon list"></div>
+  </header>
+  <aside class="panel" id="detail" aria-label="Selected typhoon information">
+    <div class="eyebrow">TRACK INFORMATION</div>
+    <h2 id="detail-title">Select a typhoon</h2><p id="detail-name" class="muted">Choose a list item or track on the map</p>
+    <div id="detail-content" hidden>
+      <div id="phase" class="phase">—</div>
+      <div class="metrics"><div><span>Central pressure</span><strong id="pressure">—</strong><small>hPa</small></div><div><span>Maximum wind</span><strong id="wind">—</strong><small>m/s</small></div></div>
+      <dl class="stats"><dt>Observation</dt><dd id="observation">—</dd><dt>Position</dt><dd id="position">—</dd><dt>Minimum pressure</dt><dd id="minimum">—</dd><dt>Record period</dt><dd id="life">—</dd></dl>
+      <button id="replay" class="wide">Replay from beginning</button>
+      <p class="muted tiny">Position is interpolated between observations. Values use the preceding observation.</p>
+    </div>
+  </aside>
+  <div id="map-tools" class="panel" aria-label="Map controls"><button id="zoom-in" aria-label="Zoom in">＋</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="home">Reset view</button></div>
+  <div id="legend" class="panel"><div class="eyebrow">INTENSITY BY MAXIMUM WIND</div><div class="legend-items"><span><i style="--c:#8294b1"></i>TD / ET</span><span><i style="--c:#5ad1c9"></i>Typhoon</span><span><i style="--c:#ffca70"></i>Strong</span><span><i style="--c:#ff895a"></i>Very strong</span><span><i style="--c:#e67ca8"></i>Violent</span></div><p class="tiny muted">Point: observed position · Solid: best track / analysis · Dashed: forecast · Circle: forecast area</p></div>
+  <div id="notice" class="panel" role="status" hidden></div>
+  <footer id="controls" class="panel">
+    <div class="time-row"><button id="play" aria-label="Play" title="Play / pause (Space)">▶</button><div id="clock">—<small>JST</small></div><input id="seek" type="range" min="0" max="10000" value="0" aria-label="Playback time"><span id="play-state">Stopped</span></div>
+    <div class="options"><label>Speed <select id="speed"><option value="1">1 hour / sec</option><option value="6">6 hours / sec</option><option value="12" selected>12 hours / sec</option><option value="24">1 day / sec</option><option value="72">3 days / sec</option></select></label><label>Period <input id="from" type="date" aria-label="Start date">to<input id="to" type="date" aria-label="End date"></label><label><input id="loop" type="checkbox" checked>Loop</label><label><input id="full" type="checkbox">Show full tracks</label><span class="spacer"></span><button id="refresh">Update data</button></div>
+    <div class="footnote"><span>Drag to pan / mouse wheel to zoom / Space to play</span><span>Best-track data are historical analysis, not forecasts · <a href="https://www.jma.go.jp/jma/jma-eng/jma-center/rsmc-hp-pub-eg/besttrack.html" target="_blank" rel="noreferrer">JMA</a> / <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a></span></div>
+  </footer>
+  <div id="tip" class="panel" hidden></div>
+  <noscript>Please enable JavaScript to use the animation.</noscript>
+</body>
+</html>
