@@ -1,24 +1,26 @@
 # TyphoonMap
 
-日本近傍を通過した台風の進路を、地図上で時系列再生するローカルアプリです。EQMapの暗色地図、浮動パネル、連続再生の操作感を踏襲しています。
+TyphoonMap is a local interactive map for replaying typhoon tracks near Japan over time. It follows EQMap's dark map, floating panels, and continuous playback controls.
 
-- 2000年以降の気象庁 RSMC Tokyo ベストトラックを同梱
-- 年と「日本近傍 / 北西太平洋全域」を選択
-- 時刻・速度・期間を指定して再生、ドラッグ移動、ズーム、台風別の再生
-- 「データ更新」を押すと、ブラウザから気象庁が発表中の台風の実況・予報進路を直接取得して暫定表示
+- Includes JMA RSMC Tokyo best-track data from 2000 onward
+- Filter by year and by tracks near Japan or across the Western North Pacific
+- Replay by time, speed, and date range; drag to pan, zoom, and replay individual storms
+- Use **Update data** to retrieve analysis and forecast tracks for currently active typhoons directly from JMA in the browser
 
-## 起動
+## Launch
 
-Windowsでは `start.bat` をダブルクリックしてください。ブラウザで `http://127.0.0.1:8765/` が開きます。サーバーの黒い画面を閉じると終了します。
+On Windows, double-click `start.bat`. The application opens at `http://127.0.0.1:8765/`. Close the server command window to stop it.
 
-`index.html` を直接開いても同梱済みの確定経路を閲覧できます。データ更新は気象庁の公開JSONをブラウザから直接取得するため、ローカルサーバー経由の外部接続権限には依存しません。
+You can also open `index.html` directly to browse the bundled best tracks. Updates use JMA's public JSON endpoints directly from the browser and do not depend on the local server having outbound network access.
 
-## データ更新
+## Refresh bundled data
 
-確定経路を最新版へ置き換えるには、Python 3.10以降で次を実行します。
+To replace the bundled best-track data with the latest version, run the following command with Python 3.10 or later:
 
 ```powershell
 python tools/update_data.py
 ```
 
-地図も更新する場合は `python tools/update_data.py --map` を実行します。出典は気象庁 RSMC Tokyo Best Track Data と気象庁台風情報です。発表中の予報経路は確定経路ではありません。
+To refresh the base map as well, run `python tools/update_data.py --map`.
+
+Sources: JMA RSMC Tokyo Best Track Data and JMA Typhoon Information. Forecast tracks for active storms are provisional and are not best-track records.
