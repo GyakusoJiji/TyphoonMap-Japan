@@ -3,7 +3,7 @@
   'use strict';
   const C = TyphoonCore, $ = id => document.getElementById(id);
   const canvas = $('tracks'), ctx = canvas.getContext('2d'), base = $('base'), bg = base.getContext('2d');
-  let data = window.TYPHOON_DATA, storms = [], selected = null, start = 0, end = 1, time = 0;
+  let data = C.withProvisional(window.TYPHOON_DATA, window.TYPHOON_PROVISIONAL), storms = [], selected = null, start = 0, end = 1, time = 0;
   let playing = false, lastFrame = 0, lastUI = 0, dirty = true, width = 0, height = 0, dpr = 1;
   let scale = 1, center = [138, 30], hits = [], drag = null;
   const JMA_TYPHOON_ROOT = 'https://www.jma.go.jp/bosai/typhoon/data';
@@ -38,12 +38,15 @@
       const number = Number(String(target.typhoonNumber || target.tropicalCyclone).slice(-2));
       return {id:`${new Date(points[0].t).getUTCFullYear()}${String(number).padStart(2,'0')}`,
         year:new Date(points[0].t).getUTCFullYear(),number,name:title.name?.en || '',points,
-        provisional:true,sourceId:target.tropicalCyclone};
+        provisional:true,named:Boolean(target.typhoonNumber),sourceId:target.tropicalCyclone};
     }));
     return results.filter(Boolean);
   }
   async function refreshLiveData() {
-    const active = await fetchCurrentStorms();
+    const fetched = await fetchCurrentStorms();
+    const byId = new Map(data.storms.map(storm => [storm.id, storm]));
+    // 番号の付いた台風だけ、貯めてある経路とつなげる（番号の無い熱帯低気圧は id が当てにならない）。
+    const active = fetched.map(storm => storm.named ? C.combineLive(byId.get(storm.id), storm) : storm);
     const ids = new Set(active.map(storm => storm.id));
     data = {...data,storms:data.storms.filter(storm => !ids.has(storm.id)).concat(active),liveUpdatedAt:new Date().toISOString()};
     return active;
@@ -113,6 +116,9 @@
     if (years.includes(Number(preferred))) $('year').value=preferred;
     $('coverage').textContent=`2000–${years[0]} / ${data.storms.length} storms`;
     $('fetched').textContent=C.formatTime(Date.parse(data.fetchedAt));
+    const provisional=data.storms.filter(s=>s.provisional).length;
+    $('source').textContent=provisional ? `JMA Best Track + ${provisional} provisional` : 'JMA Best Track';
+    $('provisional-updated').textContent=data.provisionalUpdatedAt ? C.formatTime(Date.parse(data.provisionalUpdatedAt)) : '—';
   }
   function filterStorms() {
     setPlaying(false); selected=null;
@@ -132,7 +138,7 @@
       const button=document.createElement('button'); button.className='storm'+(selected?.id===storm.id?' selected':''); button.setAttribute('aria-pressed',String(selected?.id===storm.id));
       const dot=document.createElement('span'); dot.className='dot'; dot.style.setProperty('--c',C.category(storm.points.reduce((a,b)=>(b.wind||0)>(a.wind||0)?b:a)).color);
       const text=document.createElement('span'), title=document.createElement('strong'), subtitle=document.createElement('small'), reading=document.createElement('span');
-      title.textContent=`Typhoon ${storm.number} ${storm.name || ''}`; subtitle.textContent=`${C.dateJST(storm.points[0].t).slice(5)} — ${C.dateJST(storm.points.at(-1).t).slice(5)}${storm.provisional ? ' / Live update' : ''}`; reading.className='reading'; reading.textContent=minText(storm); text.append(title,subtitle); button.append(dot,text,reading);
+      title.textContent=`Typhoon ${storm.number} ${storm.name || ''}`; subtitle.textContent=`${C.dateJST(storm.points[0].t).slice(5)} — ${C.dateJST(storm.points.at(-1).t).slice(5)}${storm.provisional ? ' / Provisional' : ''}`; reading.className='reading'; reading.textContent=minText(storm); text.append(title,subtitle); button.append(dot,text,reading);
       button.onclick=()=>selectStorm(storm); return button;
     }));
   }
@@ -148,7 +154,7 @@
     const s=selected || storms.filter(s=>C.atTime(s,time)).at(-1);
     $('detail-content').hidden=!s;
     if (!s) { $('detail-title').textContent='Select a typhoon'; $('detail-name').textContent='Choose a list item or track on the map'; return; }
-    $('detail-title').textContent=label(s); $('detail-name').textContent=(s.name||'Unnamed')+(s.provisional?' / Live update':' / Best track');
+    $('detail-title').textContent=label(s); $('detail-name').textContent=(s.name||'Unnamed')+(s.provisional?' / Provisional':' / Best track');
     const current=C.atTime(s,time), p=current?.observation;
     $('phase').textContent=p ? `${s.provisional ? (p.forecast ? 'Forecast / ' : 'Analysis / ') : ''}${C.category(p).label}` : time<s.points[0].t?'Before record':'After record'; $('phase').style.color=p?C.category(p).color:'#91a1b9';
     $('pressure').textContent=p?.pressure || '—'; $('wind').textContent=p?.wind ? (p.wind*.514444).toFixed(1) : '—';

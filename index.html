@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="style.css">
   <script defer src="data/map.js"></script>
   <script defer src="data/tracks.js"></script>
+  <script defer src="data/provisional.js"></script>
   <script defer src="core.js"></script>
   <script defer src="app.js"></script>
 </head>
@@ -19,7 +20,7 @@
   </main>
   <header class="panel" id="hud">
     <div class="brand"><span class="brand-mark">◉</span><h1>TyphoonMap<small>Typhoon Track Time-Series Animation</small></h1><span class="badge">BEST TRACK</span></div>
-    <dl class="stats"><dt>Coverage</dt><dd id="coverage">Loading…</dd><dt>Source</dt><dd>JMA Best Track</dd><dt>Fetched</dt><dd id="fetched">—</dd></dl>
+    <dl class="stats"><dt>Coverage</dt><dd id="coverage">Loading…</dd><dt>Source</dt><dd id="source">JMA Best Track</dd><dt>Fetched</dt><dd id="fetched">—</dd><dt>Provisional</dt><dd id="provisional-updated">—</dd></dl>
     <div class="filters"><label>Year <select id="year" aria-label="Year"></select></label><label>Area <select id="region"><option value="japan">Near Japan</option><option value="all">All W. North Pacific</option></select></label></div>
     <p class="muted region-note" id="region-note">Tracks entering 20–46°N / 120–155°E</p>
     <div class="list-heading"><span id="count">—</span><button id="all" class="text-button">Show all</button></div>
@@ -42,7 +43,7 @@
   <footer id="controls" class="panel">
     <div class="time-row"><button id="play" aria-label="Play" title="Play / pause (Space)">▶</button><div id="clock">—<small>JST</small></div><input id="seek" type="range" min="0" max="10000" value="0" aria-label="Playback time"><span id="play-state">Stopped</span></div>
     <div class="options"><label>Speed <select id="speed"><option value="1">1 hour / sec</option><option value="6">6 hours / sec</option><option value="12" selected>12 hours / sec</option><option value="24">1 day / sec</option><option value="72">3 days / sec</option></select></label><label>Period <input id="from" type="date" aria-label="Start date">to<input id="to" type="date" aria-label="End date"></label><label><input id="loop" type="checkbox" checked>Loop</label><label><input id="full" type="checkbox">Show full tracks</label><span class="spacer"></span><button id="refresh">Update data</button></div>
-    <div class="footnote"><span>Drag to pan / mouse wheel to zoom / Space to play</span><span>Best-track data are historical analysis, not forecasts · <a href="https://www.jma.go.jp/jma/jma-eng/jma-center/rsmc-hp-pub-eg/besttrack.html" target="_blank" rel="noreferrer">JMA</a> / <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a></span></div>
+    <div class="footnote"><span>Drag to pan / mouse wheel to zoom / Space to play</span><span>Best-track data are historical analysis, not forecasts. Provisional tracks (JMA position tables and live analyses) are replaced once JMA publishes the best track · <a href="https://www.jma.go.jp/jma/jma-eng/jma-center/rsmc-hp-pub-eg/besttrack.html" target="_blank" rel="noreferrer">JMA</a> / <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a></span></div>
   </footer>
   <div id="tip" class="panel" hidden></div>
   <noscript>Please enable JavaScript to use the animation.</noscript>

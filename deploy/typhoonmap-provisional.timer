@@ -1,0 +1,15 @@
+# 置き場所: ~/.config/systemd/user/typhoonmap-provisional.timer
+# 有効化: systemctl --user enable --now typhoonmap-provisional.timer
+# （foo は linger 有効なので、ログインしていなくても動く）
+[Unit]
+Description=TyphoonMap: 毎時 data/provisional.js を更新する
+
+[Timer]
+# 気象庁の台風情報は解析時刻の 50 分ほど後に出るので、毎時 55 分ごろに取りに行く。
+OnCalendar=*-*-* *:55:00
+RandomizedDelaySec=120
+Persistent=true
+Unit=typhoonmap-provisional.service
+
+[Install]
+WantedBy=timers.target

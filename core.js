@@ -33,7 +33,22 @@
     if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) throw new Error('Check the start and end dates.');
     return [start, end];
   }
-  const api = {HOUR, nearJapan, category, atTime, minimum, dateJST, formatTime, parseRange};
+  // ベストトラックにまだ無い台風だけを、暫定経路（data/provisional.js）から足す。
+  function withProvisional(data, provisional) {
+    if (!data?.storms || !provisional?.storms?.length) return data;
+    const ids = new Set(data.storms.map(s => s.id));
+    const extra = provisional.storms.filter(s => s.number && s.points?.length && !ids.has(s.id))
+      .map(s => ({...s, provisional:true}));
+    return {...data, storms:data.storms.concat(extra), provisionalUpdatedAt:provisional.updatedAt};
+  }
+  // 「Update data」で取った発生中の台風に、サーバーで貯めた過去の解析位置をつなげる。
+  function combineLive(stored, live) {
+    if (!stored?.provisional) return live;
+    const first = (live.points.find(p => !p.forecast) || live.points[0]).t;
+    const past = stored.points.filter(p => !p.forecast && p.t < first);
+    return {...live, name:live.name || stored.name, points:past.concat(live.points)};
+  }
+  const api = {HOUR, nearJapan, category, atTime, minimum, dateJST, formatTime, parseRange, withProvisional, combineLive};
   if (typeof module !== 'undefined') module.exports = api;
   root.TyphoonCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

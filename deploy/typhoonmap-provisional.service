@@ -1,0 +1,14 @@
+# ベストトラックにまだ載っていない台風の暫定経路（data/provisional.js）を更新する oneshot の user ユニット。
+# 置き場所: ~/.config/systemd/user/typhoonmap-provisional.service
+# typhoonmap-provisional.timer から毎時起動される。
+#   - 発生中の台風の解析位置を貯める（気象庁側には現在の位置しか残らないため、毎時取りに行く）
+#   - 6時間に1回、台風位置表（速報値の PDF）を読み直す。pdftotext（poppler-utils）が必要
+# ベストトラックに載った台風は、次の実行で自動的に外れる。
+[Unit]
+Description=TyphoonMap: 発生中の台風と台風位置表から data/provisional.js を更新する
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/TyphoonMap
+ExecStart=/usr/bin/python3 tools/update_data.py --provisional

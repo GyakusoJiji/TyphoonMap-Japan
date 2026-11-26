@@ -59,6 +59,12 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
 
+    def end_headers(self):
+        # data/*.js は毎日・毎時書き換わるので、ブラウザに毎回確認させる（変わっていなければ 304）。
+        if self.command in ('GET', 'HEAD'):
+            self.send_header('Cache-Control', 'no-cache')
+        super().end_headers()
+
     def log_message(self, format, *args):
         print(f'{self.address_string()} - {format % args}', flush=True)
 

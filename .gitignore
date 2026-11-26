@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 *.tmp
 artifacts/
+data/provisional.js
